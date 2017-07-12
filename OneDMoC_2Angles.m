@@ -21,10 +21,10 @@ function [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
     J=5*2;%*2%*2*2*2*2*2*2*2*2
   end
   if ~exist('N','var')
-    N=16;
+    N=8;
   end
   if ~exist('I','var')
-    I=16;
+    I=8;
   end
   if ~exist('mat','var')
     % Material
@@ -39,10 +39,10 @@ function [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
       field4,value4,field5,value5,field6,value6,field7,value7);
   end
   if ~exist('psi_b1_n_i','var')
-    psi_b1_n_i=ones(N,I)*1.0;
+    psi_b1_n_i=ones(N,I)*1.0/(2*pi);
   end
   if ~exist('psi_b2_n_i','var')
-    psi_b2_n_i=ones(N,I)*1.0;
+    psi_b2_n_i=ones(N,I)*1.0/(2*pi);
   end
   if ~exist('Q_MMS_j_n_i','var')
     Q_MMS_j_n_i=ones(J,N,I)*0.3/(2*pi); % removed *2.0 (angular quantity)
@@ -123,11 +123,13 @@ function [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
 
   phi0_j=phi0_j_new;
   
-  plot(phi0_j,'*');
+  plot(phi0_j,'*-');
   hold on;
   grid on;
   phi =@(x) 2.0+x*0.0;
   fplot(phi,[0,size(phi0_j,1)],'bo-');
-  hold off;
+  legend('numerical','analytical');
+%   hold off;
+  iIterate
   
 end
