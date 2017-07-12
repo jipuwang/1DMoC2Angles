@@ -10,8 +10,8 @@
 % Output: 
 %   Cell-averaged scalar flux
 
-function [phi0_j]=OneDMoC_2Angles(J,N,Tau,mat,...
-           psi_b1_n,psi_b2_n,Q_MMS_j_n)
+function [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
+           psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i)
 
 %   Input parameter
   if ~exist('Tau','var')
@@ -22,6 +22,9 @@ function [phi0_j]=OneDMoC_2Angles(J,N,Tau,mat,...
   end
   if ~exist('N','var')
     N=16;
+  end
+  if ~exist('I','var')
+    I=16;
   end
   if ~exist('mat','var')
     % Material
@@ -35,14 +38,14 @@ function [phi0_j]=OneDMoC_2Angles(J,N,Tau,mat,...
     mat = struct(field1,value1,field2,value2,field3,value3,... 
       field4,value4,field5,value5,field6,value6,field7,value7);
   end
-  if ~exist('psi_b1_n','var')
-    psi_b1_n=ones(N,1)*1.0;
+  if ~exist('psi_b1_n_i','var')
+    psi_b1_n_i=ones(N,I)*1.0;
   end
-  if ~exist('psi_b2_n','var')
-    psi_b2_n=ones(N,1)*1.0;
+  if ~exist('psi_b2_n_i','var')
+    psi_b2_n_i=ones(N,I)*1.0;
   end
-  if ~exist('Q_MMS_j_n','var')
-    Q_MMS_j_n=ones(J,N)*0.3; % removed *2.0 (angular quantity)
+  if ~exist('Q_MMS_j_n_i','var')
+    Q_MMS_j_n_i=ones(J,N,I)*0.3/(2*pi); % removed *2.0 (angular quantity)
   end
   
   % Material
@@ -60,45 +63,52 @@ function [phi0_j]=OneDMoC_2Angles(J,N,Tau,mat,...
   epsilon_phi0=1e-12;
   delta=1E-13;
   [mu_n,weight_n]=lgwt(N,-1,1); mu_n=flipud(mu_n);
-  
+  [alpha_i,weight_i]=lgwt(I,0,2*pi);alpha_i=flipud(alpha_i);
+    
   h_j=ones(J,1)*Tau/J;
   % N rays to trace, each angle has only 1 ray, no ray-spacing
   % n for each angle, and j for FSR region index
-  segLen_j_n=zeros(J,1);
+  segLen_j_n_i=zeros(J,N,I);
   for n=1:N
     for j=1:J
-      segLen_j_n(j,n)=h_j(j)/abs(mu_n(n));
+      segLen_j_n_i(j,n,:)=h_j(j)/abs(mu_n(n));
     end
   end
   
   phi0_j_old=ones(J,1);
-  q_j_n=zeros(J,N);
+  q_j_n_i=zeros(J,N,I);
   for iIterate=1:maxIterate
     for j=1:J
       for n=1:N
-        q_j_n(j,n)=(Sig_ss_j(j)+nuSig_f_j(j))*phi0_j_old(j)*0.5+Q_MMS_j_n(j,n);
+        for i=1:I
+          q_j_n_i(j,n,i)=(Sig_ss_j(j)+nuSig_f_j(j))*phi0_j_old(j)/(4*pi)+Q_MMS_j_n_i(j,n,i);
+        end
       end
     end
     phi0_j_new=zeros(J,1);
     % ray tracing
     for n=1:N/2 % backward direction
-      psi_in=psi_b2_n(n);
-      for j=J:-1:1
-        exp_temp=exp(-Sig_t_j(j)*segLen_j_n(j,n));
-        psi_out=psi_in*exp_temp+q_j_n(j,n)*Sig_t_inv_j(j)*(1-exp_temp);
-        psi_avg=q_j_n(j,n)*Sig_t_inv_j(j)+(psi_in-psi_out)/Sig_t_j(j)/segLen_j_n(j,n);
-        phi0_j_new(j)=phi0_j_new(j)+weight_n(n)*psi_avg;
-        psi_in=psi_out;
+      for i=1:I
+        psi_in=psi_b2_n_i(n,i);
+        for j=J:-1:1
+          exp_temp=exp(-Sig_t_j(j)*segLen_j_n_i(j,n,i));
+          psi_out=psi_in*exp_temp+q_j_n_i(j,n,i)*Sig_t_inv_j(j)*(1-exp_temp);
+          psi_avg=q_j_n_i(j,n,i)*Sig_t_inv_j(j)+(psi_in-psi_out)/Sig_t_j(j)/segLen_j_n_i(j,n,i);
+          phi0_j_new(j)=phi0_j_new(j)+weight_n(n)*weight_i(i)*psi_avg;
+          psi_in=psi_out;
+        end
       end
     end
     for n=N/2+1:N % forward direction
-      psi_in=psi_b1_n(n);
-      for j=1:J
-        exp_temp=exp(-Sig_t_j(j)*segLen_j_n(j,n));
-        psi_out=psi_in*exp_temp+q_j_n(j,n)*Sig_t_inv_j(j)*(1-exp_temp);
-        psi_avg=q_j_n(j,n)*Sig_t_inv_j(j)+(psi_in-psi_out)/Sig_t_j(j)/segLen_j_n(j,n);
-        phi0_j_new(j)=phi0_j_new(j)+weight_n(n)*psi_avg;
-        psi_in=psi_out;
+      for i=1:I
+        psi_in=psi_b1_n_i(n,i);
+        for j=1:J
+          exp_temp=exp(-Sig_t_j(j)*segLen_j_n_i(j,n,i));
+          psi_out=psi_in*exp_temp+q_j_n_i(j,n,i)*Sig_t_inv_j(j)*(1-exp_temp);
+          psi_avg=q_j_n_i(j,n,i)*Sig_t_inv_j(j)+(psi_in-psi_out)/Sig_t_j(j)/segLen_j_n_i(j,n,i);
+          phi0_j_new(j)=phi0_j_new(j)+weight_n(n)*weight_i(i)*psi_avg;
+          psi_in=psi_out;
+        end
       end
     end
 
@@ -112,5 +122,12 @@ function [phi0_j]=OneDMoC_2Angles(J,N,Tau,mat,...
   end  
 
   phi0_j=phi0_j_new;
-    
+  
+  plot(phi0_j,'*');
+  hold on;
+  grid on;
+  phi =@(x) 2.0+x*0.0;
+  fplot(phi,[0,size(phi0_j,1)],'bo-');
+  hold off;
+  
 end
