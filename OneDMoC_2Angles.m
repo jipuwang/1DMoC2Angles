@@ -21,10 +21,10 @@ function [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
     J=5*2;%*2%*2*2*2*2*2*2*2*2
   end
   if ~exist('N','var')
-    N=8;
+    N=16;
   end
   if ~exist('I','var')
-    I=8;
+    I=16;
   end
   if ~exist('mat','var')
     % Material
