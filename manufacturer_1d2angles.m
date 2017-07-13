@@ -53,7 +53,8 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i]=...
   switch(assumedSoln)
     case('sine_sine_sine')
       % Manufactured neutronics solution \psi(x,\mu)=sin(pi*x/Tau), 0<x<Tau
-      psi_MMS =@(x,mu,alpha) (sin(pi/Tau*x)+1).*sin(mu+1).*sin(alpha/(2*pi));
+      angleDep =@(mu,alpha) sin(mu+1).*sin(alpha/(2*pi));
+      psi_MMS =@(x,mu,alpha) (sin(pi/Tau*x)+1).*angleDep(mu,alpha);
       psi_MMS_Diff =@(x,mu,alpha) pi/Tau*cos(pi/Tau*x).*sin(mu+1).*sin(alpha/(2*pi));
     case('const_cubic')
     case('sqrtPlus1_quadratic')
@@ -68,7 +69,8 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i]=...
   % phi0_MMS =@(x) integral2(@(mu,alpha) psi_MMS(x,mu,alpha), -1,1, 0,2*pi);
   % The above function handle can support fplot, and evaluation, but not
   % further integral.  So I have to do it by hand. 
-  phi0_MMS =@(x) (sin(pi/Tau*x)+1)*(1-cos(2))*(-2*pi*(cos(1)-1));
+  angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
+  phi0_MMS =@(x) (sin(pi/Tau*x)+1)*angleIntegral;
   % MMS source: mu_n * derivative(psi_MMS) +Sig_t* psi_MMS ...
   % -(Sig_ss+nuSig_f)*0.5*phi0_MMS;
   Q_MMS =@(x,mu,alpha) mu*psi_MMS_Diff(x,mu,alpha) ...
@@ -108,5 +110,18 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i]=...
       end % i
     end % n
   end % j
+  
+  figure(1);
+  surf(psi_b1_n_i);
+  figure(2);
+  fsurf(@(mu,alpha) psi_MMS(0,mu,alpha),[-1 1 0 2*pi]);
+  figure(3);
+  surf(psi_b2_n_i);
+  figure(4);
+  fsurf(@(mu,alpha) psi_MMS(Tau,mu,alpha),[-1 1 0 2*pi]);
+  figure(5);
+  surf(0.5*(Q_MMS_j_n_i(5,:,:)+Q_MMS_j_n_i(6,:,:)));
+  figure(6);
+  fsurf(@(mu,alpha) Q_MMS(Tau/2,mu,alpha),[-1 1 0 2*pi]);
   
 end
