@@ -3,7 +3,7 @@
     % Manufactured boundary conditions
     % Manufactured source
 function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i]=...
-          manufacturer_1d2angle(J,N,I,Tau,mat,assumedSoln)
+          manufacturer_1d2angles(J,N,I,Tau,mat,assumedSoln)
   % input parameters
   if ~exist('J','var')
     J=5*2;%*2%*2*2*2*2*2*2*2*2
@@ -12,7 +12,7 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i]=...
     N=16;
   end
   if ~exist('I','var')
-    I=16;
+    I=8;
   end
   if ~exist('Tau','var')
     Tau=10;
@@ -46,16 +46,17 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i]=...
   [mu_n,weight_n]=lgwt(N,-1,1); mu_n=flipud(mu_n);
   [alpha_i,weight_i]=lgwt(I,0,2*pi);alpha_i=flipud(alpha_i);
 
-  %% Manufactured Solutions for both fields
-  % They need to be pre-defined here due to temperature dependence on the
-  % xs. 
-  % Options includes: sine_sine, const_cubic, sqrtPlus1_quadratic, etc.
+  %% Manufactured Solutions 
+  % Options includes: sine_sine_sine, etc.
   switch(assumedSoln)
     case('sine_sine_sine')
-      % Manufactured neutronics solution \psi(x,\mu)=sin(pi*x/Tau), 0<x<Tau
-      angleDep =@(mu,alpha) sin(mu+1).*sin(alpha/(2*pi));
-      psi_MMS =@(x,mu,alpha) (sin(pi/Tau*x)+1).*angleDep(mu,alpha);
-      psi_MMS_Diff =@(x,mu,alpha) pi/Tau*cos(pi/Tau*x).*sin(mu+1).*sin(alpha/(2*pi));
+      % Manufactured neutronics solution
+      % angleDep =@(mu,alpha) sin(mu+1).*sin(alpha/(2*pi));
+      angleDep =@(mu,alpha) exp(0.5.*(mu+1)).*exp(0.5/pi.*alpha);
+      psi_MMS =@(x,mu,alpha) (sin(pi/Tau.*x)+1).*angleDep(mu,alpha);
+      % psi_MMS =@(x,mu,alpha) (sin(pi/Tau.*x)+1).*sin(mu+1).*sin(1/(2*pi).*alpha);
+      psi_MMS_Diff =@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
+      % psi_MMS_Diff =@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*sin(mu+1).*sin(1/(2*pi).*alpha);
     case('const_cubic')
     case('sqrtPlus1_quadratic')
   end
@@ -66,18 +67,15 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i]=...
   nuSig_f =@(x) nuSig_f_j(1)+x*0;
   Sig_t =@(x) Sig_ss(x)+Sig_f(x)+Sig_gamma(x);
   
-  % phi0_MMS =@(x) integral2(@(mu,alpha) psi_MMS(x,mu,alpha), -1,1, 0,2*pi);
-  % The above function handle can support fplot, and evaluation, but not
-  % further integral.  So I have to do it by hand. 
   angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
-  phi0_MMS =@(x) (sin(pi/Tau*x)+1)*angleIntegral;
-  % MMS source: mu_n * derivative(psi_MMS) +Sig_t* psi_MMS ...
-  % -(Sig_ss+nuSig_f)*0.5*phi0_MMS;
-  Q_MMS =@(x,mu,alpha) mu*psi_MMS_Diff(x,mu,alpha) ...
+  phi0_MMS =@(x) (sin(pi/Tau.*x)+1)*angleIntegral;
+  % phi0_MMS =@(x) integral2(@(mu,alpha) psi_MMS(x,mu,alpha), -1,1, 0,2*pi);
+
+  % MMS source: mu_n*derivative(psi_MMS) +Sig_t*psi_MMS ...
+  % -1/(4*pi)*(Sig_ss+nuSig_f)*phi0_MMS;
+  Q_MMS =@(x,mu,alpha) mu.*psi_MMS_Diff(x,mu,alpha) ...
     +Sig_t(x).*psi_MMS(x,mu,alpha) ...
-    -1/(4*pi)*Sig_ss(x).*phi0_MMS(x);
-  % no fission source
-%     -(Sig_ss(x)+nuSig_f(x))/(4*pi).*phi0_MMS(x);
+    -1/(4*pi).*Sig_ss(x).*phi0_MMS(x);
   
   %% For MoC MMS solution and problem
   % Boundary condition and source
@@ -104,9 +102,8 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i]=...
     phi0_MMS_j(j)=1/h*integral(phi0_MMS,x_L,x_R);
     for n=1:N
       for i=1:I
-        % g = @(c) (integral(@(x) (x.^2 + c*x + 1),0,1));
         Q_MMS_j_n_i(j,n,i)= ...
-          integral(@(x) Q_MMS(x,mu_n(n),alpha_i(i)),x_L,x_R)/h;
+          1/h*integral(@(x) Q_MMS(x,mu_n(n),alpha_i(i)),x_L,x_R, 'ArrayValued',true);
       end % i
     end % n
   end % j
@@ -120,7 +117,13 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i]=...
   figure(4);
   fsurf(@(mu,alpha) psi_MMS(Tau,mu,alpha),[-1 1 0 2*pi]);
   figure(5);
-  surf(0.5*(Q_MMS_j_n_i(5,:,:)+Q_MMS_j_n_i(6,:,:)));
+  QMMS_midpoint=ones(N,I);
+  for n=1:N
+    for i=1:I
+      QMMS_midpoint(n,i)=0.5*(Q_MMS_j_n_i(5,n,i)+Q_MMS_j_n_i(6,n,i));
+    end
+  end
+  surf(QMMS_midpoint);
   figure(6);
   fsurf(@(mu,alpha) Q_MMS(Tau/2,mu,alpha),[-1 1 0 2*pi]);
   
