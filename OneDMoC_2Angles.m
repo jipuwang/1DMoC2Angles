@@ -123,11 +123,12 @@ function [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
 
   phi0_j=phi0_j_new;
   
+  figure(11);
   plot(phi0_j,'*-');
   hold on;
   grid on;
-  phi =@(x) 2.0+x*0.0;
-  fplot(phi,[0,size(phi0_j,1)],'bo-');
+  phi0_MMS =@(x) (sin(pi/(size(phi0_j,1)).*x)+1)*37.102114262431876;
+  fplot(phi0_MMS,[0,size(phi0_j,1)],'bo-');
   legend('numerical','analytical');
 %   hold off;
   iIterate
