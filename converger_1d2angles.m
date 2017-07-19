@@ -51,6 +51,18 @@ for iGrid=1:nGrids
   % Calculate the error compared to manufactured solution
   error_phi0_n(iGrid)=norm(phi0_j-phi0_j_ana,2)/sqrt(J);
   
+  % Plot the solution
+  figure(11);
+  plot(phi0_j,'*-');
+  hold on;
+  grid on;
+  phi0_MMS =@(x) (sin(pi/(size(phi0_j,1)).*x)+1)*37.102114262431876;
+  fplot(phi0_MMS,[0,size(phi0_j,1)],'bo-');
+  legend('numerical','analytical');
+  title('scalar flux');
+  xlabel('mesh size [cm]');
+  ylabel('scalar flux');
+  
 end
 
 % Calculate the order of accuracy
@@ -60,53 +72,34 @@ for j=1:nGrids-1
     log(gridMeshSize_n(j)/gridMeshSize_n(j+1));
 end
 
-% %% Visualize the results
-% orderPlotGrid=[gridMeshSize_n(1) gridMeshSize_n(end)];
-% 
-% scalarFluxErrorRMS_plot_handle=figure(11);
-% loglog(gridMeshSize_n,error_phi0_n,'*');
-% % title('scalar flux error convergence');
-% xlabel('mesh size [cm]');
-% ylabel('scalar flux error RMS');
-% 
-% hold on;
-% orderGuess=round(order_phi_nMinus1(end));
-% errorStt=error_phi0_n(end)*refinementRatio^(orderGuess*(nGrids-1));
-% firstOrder=[errorStt errorStt/refinementRatio^(nGrids-1)];
-% secondOrder=[errorStt errorStt/refinementRatio^(2*(nGrids-1))];
-% thirdOrder=[errorStt errorStt/refinementRatio^(3*(nGrids-1))];
-% fourthOrder=[errorStt errorStt/refinementRatio^(4*(nGrids-1))];
-% loglog(orderPlotGrid,firstOrder,'--');
-% loglog(orderPlotGrid,secondOrder,'--');
-% loglog(orderPlotGrid,thirdOrder,'--');
-% loglog(orderPlotGrid,fourthOrder,'--');
-% legend('scalar flux error','1st Order','2nd Order',...
-%   '3rd Order','4th Order','location','best');
-% hold off;
-% 
+%% Visualize the asymptotic convergence
+orderPlotGrid=[gridMeshSize_n(1) gridMeshSize_n(end)];
 
-% % Plot the solution
-% scalarFlux_plot_handle=figure(13);
-% plot(phi0_j,'-*');
-% % title('scalar flux');
-% xlabel('mesh size [cm]');
-% ylabel('scalar flux');
+scalarFluxErrorRMS_plot_handle=figure(13);
+loglog(gridMeshSize_n,error_phi0_n,'*');
+% title('scalar flux error convergence');
+xlabel('mesh size [cm]');
+ylabel('scalar flux error RMS');
 
-% % Save the plots
-% phi0_RMS_fn=char(strcat('fbType_',fbType,'_mocSrc_',mocSrc,'_soln_',assumedSoln,'_','phi0_RMS'));
-% T_RMS_fn=char(strcat('fbType_',fbType,'_mocSrc_',mocSrc,'_soln_',assumedSoln,'_','T_RMS'));
-% phi0_fn=char(strcat('fbType_',fbType,'_mocSrc_',mocSrc,'_soln_',assumedSoln,'_','phi0'));
-% T_fn=char(strcat('fbType_',fbType,'_mocSrc_',mocSrc,'_soln_',assumedSoln,'_','T'));
-% 
-% savefig(scalarFluxErrorRMS_plot_handle,phi0_RMS_fn)
-% savefig(temperatureErrorRM_plot_handle,T_RMS_fn)
-% savefig(scalarFlux_plot_handle,phi0_fn)
-% savefig(temperature_plot_handle,T_fn)
-% Display the problem description
+hold on;
+orderGuess=round(order_phi_nMinus1(end));
+errorStt=error_phi0_n(end)*refinementRatio^(orderGuess*(nGrids-1));
+firstOrder=[errorStt errorStt/refinementRatio^(nGrids-1)];
+secondOrder=[errorStt errorStt/refinementRatio^(2*(nGrids-1))];
+thirdOrder=[errorStt errorStt/refinementRatio^(3*(nGrids-1))];
+fourthOrder=[errorStt errorStt/refinementRatio^(4*(nGrids-1))];
+loglog(orderPlotGrid,firstOrder,'--');
+loglog(orderPlotGrid,secondOrder,'--');
+loglog(orderPlotGrid,thirdOrder,'--');
+loglog(orderPlotGrid,fourthOrder,'--');
+legend('scalar flux error','1st Order','2nd Order',...
+  '3rd Order','4th Order','location','best');
+hold off;
 
+
+% Display the problem description and results
 disp '=================';
 display(assumedSoln);
-% % Display the result
 error_phi0_n
 order_phi_nMinus1
 display(char(strcat('soln_',assumedSoln)));
@@ -114,5 +107,4 @@ display(char(num2str(order_phi_nMinus1(end))));
 
 order_phi=order_phi_nMinus1(end);
 
-% aa=0.0;
 end
