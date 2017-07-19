@@ -81,7 +81,7 @@ function [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
     for j=1:J
       for n=1:N
         for i=1:I
-          q_j_n_i(j,n,i)=(Sig_ss_j(j)+nuSig_f_j(j))*phi0_j_old(j)/(4*pi)+Q_MMS_j_n_i(j,n,i);
+          q_j_n_i(j,n,i)=Sig_ss_j(j)*phi0_j_old(j)/(4*pi)+Q_MMS_j_n_i(j,n,i);
         end
       end
     end
