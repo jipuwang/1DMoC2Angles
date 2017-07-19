@@ -107,24 +107,25 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i]=...
       end % i
     end % n
   end % j
-  
-  figure(1);
-  surf(psi_b1_n_i);
-  figure(2);
-  fsurf(@(mu,alpha) psi_MMS(0,mu,alpha),[-1 1 0 2*pi]);
-  figure(3);
-  surf(psi_b2_n_i);
-  figure(4);
-  fsurf(@(mu,alpha) psi_MMS(Tau,mu,alpha),[-1 1 0 2*pi]);
-  figure(5);
-  QMMS_midpoint=ones(N,I);
-  for n=1:N
-    for i=1:I
-      QMMS_midpoint(n,i)=0.5*(Q_MMS_j_n_i(5,n,i)+Q_MMS_j_n_i(6,n,i));
-    end
-  end
-  surf(QMMS_midpoint);
-  figure(6);
-  fsurf(@(mu,alpha) Q_MMS(Tau/2,mu,alpha),[-1 1 0 2*pi]);
+
+  % The following plot is for debugging purposes. 
+%   figure(1);
+%   surf(psi_b1_n_i);
+%   figure(2);
+%   fsurf(@(mu,alpha) psi_MMS(0,mu,alpha),[-1 1 0 2*pi]);
+%   figure(3);
+%   surf(psi_b2_n_i);
+%   figure(4);
+%   fsurf(@(mu,alpha) psi_MMS(Tau,mu,alpha),[-1 1 0 2*pi]);
+%   figure(5);
+%   QMMS_midpoint=ones(N,I);
+%   for n=1:N
+%     for i=1:I
+%       QMMS_midpoint(n,i)=0.5*(Q_MMS_j_n_i(5,n,i)+Q_MMS_j_n_i(6,n,i));
+%     end
+%   end
+%   surf(QMMS_midpoint);
+%   figure(6);
+%   fsurf(@(mu,alpha) Q_MMS(Tau/2,mu,alpha),[-1 1 0 2*pi]);
   
 end
