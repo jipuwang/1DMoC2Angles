@@ -11,7 +11,7 @@
 % and pass the grid information to the coupler. 
 function [order_phi]=converger_1d2angles(assumedSoln)
 % clear;
-nGrids=2%6;%10;%8;
+nGrids=4%6;%10;%8;
 refinementRatio=2;
 
 % Geometry
@@ -23,9 +23,9 @@ if ~exist('assumedSoln','var')
 end
 
 error_phi0_n=zeros(nGrids,1);
-gridMeshSize_n=ones(nGrids,1);
+gridMeshSize_n=zeros(nGrids,1);
 N=16; % angular discretization, fixed not refined. 
-I=16;
+I=8;
 
 for iGrid=1:nGrids
   J=5*refinementRatio^iGrid;
