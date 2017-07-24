@@ -19,13 +19,15 @@ Tau=10;
 
 % Case configure options
 if ~exist('assumedSoln','var')
-  assumedSoln='sine_sine_sine';
+%   assumedSoln='sine_sine_sine';
+  assumedSoln='IHM';
+%   assumedSoln='sine_exp_exp';
 end
 
 error_phi0_n=zeros(nGrids,1);
 gridMeshSize_n=zeros(nGrids,1);
-N=16; % angular discretization, fixed not refined. 
-I=8;
+N=4; % angular discretization, fixed not refined. 
+I=4;
 
 for iGrid=1:nGrids
   J=5*refinementRatio^iGrid;
@@ -56,7 +58,15 @@ for iGrid=1:nGrids
   plot(phi0_j,'*-');
   hold on;
   grid on;
-  phi0_MMS =@(x) (sin(pi/(size(phi0_j,1)).*x)+1)*37.102114262431876;
+  switch assumedSoln
+    case 'sine_sine_sine'
+      phi0_MMS =@(x) (sin(pi/(size(phi0_j,1)).*x)+1)*4.090350086939905;
+    case 'sine_exp_exp'
+      phi0_MMS =@(x) (sin(pi/(size(phi0_j,1)).*x)+1)*37.102114262431876;
+    case 'IHM'
+      phi0_MMS =@(x) 2.0+0.0*x;
+  end
+  
   fplot(phi0_MMS,[0,size(phi0_j,1)],'bo-');
   legend('numerical','analytical');
   title('scalar flux');
@@ -64,6 +74,7 @@ for iGrid=1:nGrids
   ylabel('scalar flux');
   
 end
+figure(11); hold off;
 
 % Calculate the order of accuracy
 order_phi_nMinus1=ones(nGrids-1,1);

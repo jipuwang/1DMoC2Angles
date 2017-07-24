@@ -48,28 +48,35 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i]=...
 
   %% Manufactured Solutions 
   % Options includes: sine_sine_sine, etc.
-  switch(assumedSoln)
-    case('sine_sine_sine')
-      % Manufactured neutronics solution
-      % angleDep =@(mu,alpha) sin(mu+1).*sin(alpha/(2*pi));
+  switch assumedSoln
+    case 'IHM'
+      angleDep =@(mu,alpha) 2.0/(2*2*pi)+0.0*mu+0.0*alpha;
+      psi_MMS =@(x,mu,alpha) (1.0+0.0*x).*angleDep(mu,alpha);
+      psi_MMS_Diff =@(x,mu,alpha) (0.0+0.0*x).*angleDep(mu,alpha);
+      angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
+      phi0_MMS =@(x) (1.0+0.0*x)*angleIntegral;
+    case 'sine_sine_sine'
+      angleDep =@(mu,alpha) sin(mu+1).*sin(alpha/(2*pi));
+      psi_MMS =@(x,mu,alpha) (sin(pi/Tau.*x)+1).*angleDep(mu,alpha);
+      psi_MMS_Diff =@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
+      angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
+      phi0_MMS =@(x) (sin(pi/Tau.*x)+1)*angleIntegral;
+    case 'sine_exp_exp'
       angleDep =@(mu,alpha) exp(0.5.*(mu+1)).*exp(0.5/pi.*alpha);
       psi_MMS =@(x,mu,alpha) (sin(pi/Tau.*x)+1).*angleDep(mu,alpha);
-      % psi_MMS =@(x,mu,alpha) (sin(pi/Tau.*x)+1).*sin(mu+1).*sin(1/(2*pi).*alpha);
       psi_MMS_Diff =@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
-      % psi_MMS_Diff =@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*sin(mu+1).*sin(1/(2*pi).*alpha);
-    case('const_cubic')
-    case('sqrtPlus1_quadratic')
+      angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
+      phi0_MMS =@(x) (sin(pi/Tau.*x)+1)*angleIntegral;
   end
   
+  % Hopefully it can be cleaned up into this following form. 
+  % phi0_MMS =@(x) integral2(@(mu,alpha) psi_MMS(x,mu,alpha), -1,1, 0,2*pi);
+
   Sig_ss =@(x) Sig_ss_j(1)+x*0;
   Sig_gamma =@(x) mat.Sig_gamma_j(1)+0.0*x;
   Sig_f =@(x) Sig_f_j(1)+x*0;
   nuSig_f =@(x) nuSig_f_j(1)+x*0;
   Sig_t =@(x) Sig_ss(x)+Sig_f(x)+Sig_gamma(x);
-  
-  angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
-  phi0_MMS =@(x) (sin(pi/Tau.*x)+1)*angleIntegral;
-  % phi0_MMS =@(x) integral2(@(mu,alpha) psi_MMS(x,mu,alpha), -1,1, 0,2*pi);
 
   % MMS source: mu_n*derivative(psi_MMS) +Sig_t*psi_MMS ...
   % -1/(4*pi)*(Sig_ss+nuSig_f)*phi0_MMS;
