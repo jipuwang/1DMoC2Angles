@@ -11,7 +11,7 @@
 % and pass the grid information to the coupler. 
 function [order_phi]=converger_1d2angles(assumedSoln)
 % clear;
-nGrids=8%4%4%6;%10;%8;
+nGrids=7%8%4%4%6;%10;%8;
 refinementRatio=4;
 
 % Geometry
@@ -20,8 +20,8 @@ Tau=10;
 % Case configure options
 if ~exist('assumedSoln','var')
 %   assumedSoln='sine_sine_sine';
-  assumedSoln='IHM';
-%   assumedSoln='sine_exp_exp';
+%   assumedSoln='IHM';
+  assumedSoln='sine_exp_exp';
 end
 
 error_phi0_n=zeros(nGrids,1);
@@ -51,7 +51,7 @@ for iGrid=1:nGrids
     psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i);
 
   % Calculate the error compared to manufactured solution
-  error_phi0_n(iGrid)=norm(phi0_j-phi0_j_ana,2)/sqrt(J);
+  error_phi0_n(iGrid)=norm(phi0_j-phi0_j_ana,2)/sqrt(J)
   
 %   % Plot the solution
 %   figure(11);
