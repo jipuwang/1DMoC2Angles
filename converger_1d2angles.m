@@ -26,7 +26,7 @@ end
 
 error_phi0_n=zeros(nGrids,1);
 gridMeshSize_n=zeros(nGrids,1);
-N=4; % angular discretization, fixed not refined. 
+N=2; % angular discretization, fixed not refined. 
 I=4;
 
 for iGrid=1:nGrids
