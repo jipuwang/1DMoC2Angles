@@ -67,6 +67,12 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i]=...
       psi_MMS_Diff =@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
       angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
       phi0_MMS =@(x) (sin(pi/Tau.*x)+1)*angleIntegral;
+    case 'sine_complex_complex'
+      angleDep =@(mu,alpha) exp(cos(mu.*mu)).*exp(cos(0.25/(pi*pi)*alpha.*alpha));
+      psi_MMS =@(x,mu,alpha) (sin(pi/Tau.*x)+1).*angleDep(mu,alpha);
+      psi_MMS_Diff =@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
+      angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
+      phi0_MMS =@(x) (sin(pi/Tau.*x)+1)*angleIntegral;      
   end
   
   % Hopefully it can be cleaned up into this following form. 
