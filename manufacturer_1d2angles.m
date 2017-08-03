@@ -2,7 +2,7 @@
     % Discretized analytical solution
     % Manufactured boundary conditions
     % Manufactured source
-function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i]=...
+function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i,error_ang_j]=...
           manufacturer_1d2angles(J,N,I,Tau,mat,assumedSoln)
   % input parameters
   if ~exist('J','var')
@@ -120,7 +120,10 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i]=...
       end % i
     end % n
   end % j
-
+  
+  % prepare for the angular error
+  error_ang_j=ones(J,1);
+  
   % The following plot is for debugging purposes. 
 %   figure(1);
 %   surf(psi_b1_n_i);
