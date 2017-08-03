@@ -11,8 +11,8 @@
 % and pass the grid information to the coupler. 
 function [order_phi]=converger_1d2angles(assumedSoln)
 % clear;
-nGrids=7%8%4%4%6;%10;%8;
-refinementRatio=4;
+nGrids=4%8%4%4%6;%10;%8;
+refinementRatio=2;
 
 % Geometry
 Tau=10; 
@@ -22,11 +22,12 @@ if ~exist('assumedSoln','var')
 %   assumedSoln='sine_sine_sine';
 %   assumedSoln='IHM';
   assumedSoln='sine_exp_exp';
+%   assumedSoln='sine_complex_complex';
 end
 
 error_phi0_n=zeros(nGrids,1);
 gridMeshSize_n=zeros(nGrids,1);
-N=4; % angular discretization, fixed not refined. 
+N=2; % angular discretization, fixed not refined. 
 I=4;
 
 for iGrid=1:nGrids
@@ -111,6 +112,7 @@ hold off;
 % Display the problem description and results
 disp '=================';
 display(assumedSoln);
+display(refinementRatio);
 error_phi0_n
 order_phi_nMinus1
 display(char(strcat('soln_',assumedSoln)));
