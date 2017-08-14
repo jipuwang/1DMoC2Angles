@@ -50,29 +50,59 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i,error_ang_j]=...
   % Options includes: sine_sine_sine, etc.
   switch assumedSoln
     case 'IHM'
-      angleDep =@(mu,alpha) 2.0/(2*2*pi)+0.0*mu+0.0*alpha;
-      psi_MMS =@(x,mu,alpha) (1.0+0.0*x).*angleDep(mu,alpha);
-      psi_MMS_Diff =@(x,mu,alpha) (0.0+0.0*x).*angleDep(mu,alpha);
+      angleDep=@(mu,alpha) 2.0/(2*2*pi)+0.0*mu+0.0*alpha;
+      psi_MMS=@(x,mu,alpha) (1.0+0.0*x).*angleDep(mu,alpha);
+      psi_MMS_Diff=@(x,mu,alpha) (0.0+0.0*x).*angleDep(mu,alpha);
       angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
       phi0_MMS =@(x) (1.0+0.0*x)*angleIntegral;
     case 'sine_sine_sine'
-      angleDep =@(mu,alpha) sin(mu+1).*sin(alpha/(2*pi));
-      psi_MMS =@(x,mu,alpha) (sin(pi/Tau.*x)+1).*angleDep(mu,alpha);
-      psi_MMS_Diff =@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
+      angleDep=@(mu,alpha) sin(mu+1).*sin(alpha/(2*pi));
+      psi_MMS=@(x,mu,alpha) (sin(pi/Tau.*x)+1).*angleDep(mu,alpha);
+      psi_MMS_Diff=@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
       angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
       phi0_MMS =@(x) (sin(pi/Tau.*x)+1)*angleIntegral;
     case 'sine_exp_exp'
-      angleDep =@(mu,alpha) exp(0.5.*(mu+1)).*exp(0.5/pi.*alpha);
-      psi_MMS =@(x,mu,alpha) (sin(pi/Tau.*x)+1).*angleDep(mu,alpha);
-      psi_MMS_Diff =@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
+      angleDep=@(mu,alpha) exp(0.5.*(mu+1)).*exp(0.5/pi.*alpha);
+      psi_MMS=@(x,mu,alpha) (sin(pi/Tau.*x)+1).*angleDep(mu,alpha);
+      psi_MMS_Diff=@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
       angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
-      phi0_MMS =@(x) (sin(pi/Tau.*x)+1)*angleIntegral;
+      phi0_MMS=@(x) (sin(pi/Tau.*x)+1)*angleIntegral;
+    case 'sine_const_const'
+      angleDep=@(mu,alpha) 1.0+mu*0.0+alpha*0.0;
+      psi_MMS=@(x,mu,alpha) (sin(pi/Tau.*x)+1).*angleDep(mu,alpha);
+      psi_MMS_Diff=@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
+      angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
+      phi0_MMS=@(x) (sin(pi/Tau.*x)+1)*angleIntegral;
     case 'sine_complex_complex'
-      angleDep =@(mu,alpha) exp(cos(mu.*mu)).*exp(cos(0.25/(pi*pi)*alpha.*alpha));
-      psi_MMS =@(x,mu,alpha) (sin(pi/Tau.*x)+1).*angleDep(mu,alpha);
-      psi_MMS_Diff =@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
+      angleDep=@(mu,alpha) exp(cos(mu.*mu)).*exp(cos(0.25/(pi*pi)*alpha.*alpha));
+      psi_MMS=@(x,mu,alpha) (sin(pi/Tau.*x)+1).*angleDep(mu,alpha);
+      psi_MMS_Diff=@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
       angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
-      phi0_MMS =@(x) (sin(pi/Tau.*x)+1)*angleIntegral;      
+      phi0_MMS=@(x) (sin(pi/Tau.*x)+1)*angleIntegral;
+    case 'const_exp_exp'
+      angleDep=@(mu,alpha) exp(0.5.*(mu+1)).*exp(0.5/pi.*alpha);
+      psi_MMS=@(x,mu,alpha) (1.0+0.0*x).*angleDep(mu,alpha);
+      psi_MMS_Diff=@(x,mu,alpha) 0.0*x.*angleDep(mu,alpha);
+      angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
+      phi0_MMS=@(x) (1.0+0.0*x)*angleIntegral;
+    case 'const_exp_const'
+      angleDep=@(mu,alpha) exp(0.5.*(mu+1))+0.0*alpha;
+      psi_MMS=@(x,mu,alpha) (1.0+0.0*x).*angleDep(mu,alpha);
+      psi_MMS_Diff=@(x,mu,alpha) 0.0*x.*angleDep(mu,alpha);
+      angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
+      phi0_MMS=@(x) (1.0+0.0*x)*angleIntegral;
+    case 'const_const_exp'
+      angleDep=@(mu,alpha) 0.0*mu+exp(0.5/pi.*alpha);
+      psi_MMS=@(x,mu,alpha) (1.0+0.0*x).*angleDep(mu,alpha);
+      psi_MMS_Diff=@(x,mu,alpha) 0.0*x.*angleDep(mu,alpha);
+      angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
+      phi0_MMS=@(x) (1.0+0.0*x)*angleIntegral;
+    case 'const_const_const'
+      angleDep=@(mu,alpha) 1.0+(0.0*mu+0.0*alpha);
+      psi_MMS=@(x,mu,alpha) (1.0+0.0*x).*angleDep(mu,alpha);
+      psi_MMS_Diff=@(x,mu,alpha) 0.0*x.*angleDep(mu,alpha);
+      angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
+      phi0_MMS=@(x) (1.0+0.0*x)*angleIntegral;
   end
   
   % Hopefully it can be cleaned up into this following form. 
@@ -110,19 +140,24 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i,error_ang_j]=...
   phi0_MMS_j=zeros(J,1);
   Q_MMS_j_n_i=zeros(J,N,I);
 
+  error_ang_j=ones(J,1);
   for j=1:J
     x_L=(j-1)*h;x_R=j*h;
     phi0_MMS_j(j)=1/h*integral(phi0_MMS,x_L,x_R);
+    numSum=0;
     for n=1:N
       for i=1:I
         Q_MMS_j_n_i(j,n,i)= ...
           1/h*integral(@(x) Q_MMS(x,mu_n(n),alpha_i(i)),x_L,x_R, 'ArrayValued',true);
+        spatialAvg=1/h*integral(@(x) psi_MMS(x,mu_n(n),alpha_i(i)),x_L,x_R);
+        numSum=numSum+weight_n(n)*weight_i(i)*spatialAvg;
       end % i
     end % n
+    error_ang_j(j)=numSum-phi0_MMS_j(j);
   end % j
   
   % prepare for the angular error
-  error_ang_j=ones(J,1);
+  
   
   % The following plot is for debugging purposes. 
 %   figure(1);
