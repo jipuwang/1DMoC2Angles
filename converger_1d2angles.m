@@ -20,9 +20,15 @@ Tau=10;
 % Case configure options
 if ~exist('assumedSoln','var')
 %   assumedSoln='sine_sine_sine';
-%   assumedSoln='IHM';
+  assumedSoln='IHM';
   assumedSoln='sine_exp_exp';
-%   assumedSoln='sine_complex_complex';
+  assumedSoln='sine_const_const';
+  assumedSoln='sine_complex_complex';
+  assumedSoln='const_exp_exp';
+  assumedSoln='const_exp_const';
+%   assumedSoln='const_const_exp';
+  assumedSoln='const_const_const';
+  
 end
 
 error_phi0_n=zeros(nGrids,1);
@@ -36,8 +42,8 @@ for iGrid=1:nGrids
   iGrid
   % Material
   field1='Sig_t_j';          value1=ones(J,1);
-  field2='Sig_ss_j';         value2=ones(J,1)*0.5;
-  field3='Sig_gamma_j';      value3=ones(J,1)*0.4;
+  field2='Sig_ss_j';         value2=ones(J,1)*0.4;
+  field3='Sig_gamma_j';      value3=ones(J,1)*0.5;
   field4='Sig_f_j';          value4=ones(J,1)*0.1;
   field5='nuSig_f_j';        value5=ones(J,1)*0.2;
   field6='thermal_cond_k_j'; value6=ones(J,1);
@@ -52,7 +58,8 @@ for iGrid=1:nGrids
     psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i);
 
   % Calculate the error compared to manufactured solution
-  error_phi0_n(iGrid)=norm(phi0_j-phi0_j_ana,2)/sqrt(J)
+%   error_ang_j=zeros(J,1);
+  error_phi0_n(iGrid)=norm(phi0_j-phi0_j_ana-error_ang_j,2)/sqrt(J)
   
 %   % Plot the solution
 %   figure(11);
@@ -75,7 +82,7 @@ for iGrid=1:nGrids
 %   ylabel('scalar flux');
   
 end
-figure(11); hold off;
+% figure(11); hold off;
 
 % Calculate the order of accuracy
 order_phi_nMinus1=ones(nGrids-1,1);
