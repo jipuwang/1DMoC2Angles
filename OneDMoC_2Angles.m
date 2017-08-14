@@ -60,7 +60,7 @@ function [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
   
   % Default variables, can be customized. 
   maxIterate=2000;
-  epsilon_phi0=1e-12;
+  epsilon_phi0=1e-14;
   delta=1E-13;
   [mu_n,weight_n]=lgwt(N,-1,1); mu_n=flipud(mu_n);
   [alpha_i,weight_i]=lgwt(I,0,2*pi);alpha_i=flipud(alpha_i);
