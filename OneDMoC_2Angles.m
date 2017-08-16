@@ -1,5 +1,5 @@
 % 1D MoC Module
-% Input: 
+% Input:
 %   Geometry Tau
 %   Spatial discretization J (or mesh size)
 %   Polar discretization N
@@ -7,7 +7,7 @@
 %   Material: all cross sections
 %   Boundary conditions
 %   Distributed source, can be MMS
-% Output: 
+% Output:
 %   Cell-averaged scalar flux
 
 function [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
@@ -35,7 +35,7 @@ function [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
     field5='nuSig_f_j';        value5=ones(J,1)*0.2;
     field6='thermal_cond_k_j'; value6=ones(J,1);
     field7='kappaSig_f_j';     value7=ones(J,1)*0.1; % kappa=1.0;
-    mat = struct(field1,value1,field2,value2,field3,value3,... 
+    mat = struct(field1,value1,field2,value2,field3,value3,...
       field4,value4,field5,value5,field6,value6,field7,value7);
   end
   if ~exist('psi_b1_n_i','var')
@@ -47,7 +47,7 @@ function [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
   if ~exist('Q_MMS_j_n_i','var')
     Q_MMS_j_n_i=ones(J,N,I)*0.3/(2*pi); % removed *2.0 (angular quantity)
   end
-  
+
   % Material
   Sig_ss_j=mat.Sig_ss_j;
   nuSig_f_j=mat.nuSig_f_j;
@@ -57,14 +57,14 @@ function [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
 %   Sig_t_j=ones(J,1);
 
   Sig_t_inv_j=1./Sig_t_j;
-  
-  % Default variables, can be customized. 
+
+  % Default variables, can be customized.
   maxIterate=2000;
   epsilon_phi0=1e-14;
   delta=1E-13;
   [mu_n,weight_n]=lgwt(N,-1,1); mu_n=flipud(mu_n);
   [alpha_i,weight_i]=lgwt(I,0,2*pi);alpha_i=flipud(alpha_i);
-    
+
   h_j=ones(J,1)*Tau/J;
   % N rays to trace, each angle has only 1 ray, no ray-spacing
   % n for each angle, and j for FSR region index
@@ -74,7 +74,7 @@ function [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
       segLen_j_n_i(j,n,:)=h_j(j)/abs(mu_n(n));
     end
   end
-  
+
   phi0_j_old=ones(J,1);
   q_j_n_i=zeros(J,N,I);
   for iIterate=1:maxIterate
@@ -119,8 +119,8 @@ function [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
       break;
     end
     phi0_j_old=phi0_j_new;
-  end  
+  end
 
   phi0_j=phi0_j_new;
-  
+
 end
