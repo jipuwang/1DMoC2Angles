@@ -54,7 +54,7 @@ for iGrid=1:nGrids
         manufacturer_1d2angles(J,N,I,Tau,mat,assumedSoln);
       
   [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
-    psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i);
+    psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i,error_ang_j);
 
   % Calculate the error compared to manufactured solution
 %   error_ang_j=zeros(J,1);
