@@ -19,15 +19,14 @@ Tau=10;
 
 % Case configure options
 if ~exist('assumedSoln','var')
-%   assumedSoln='sine_sine_sine';
   assumedSoln='IHM';
   assumedSoln='sine_exp_exp';
   assumedSoln='sine_const_const';
   assumedSoln='sine_complex_complex';
-  assumedSoln='const_exp_exp';
-  assumedSoln='const_exp_const';
+%   assumedSoln='const_exp_exp';
+%   assumedSoln='const_exp_const';
 %   assumedSoln='const_const_exp';
-  assumedSoln='const_const_const';
+%   assumedSoln='const_const_const';
   
 end
 
@@ -118,13 +117,12 @@ hold off;
 
 % Display the problem description and results
 disp '=================';
-display(assumedSoln);
-display(refinementRatio);
+display(['assumedSoln: ' assumedSoln]);
+display(['refinementRatio: ' num2str(refinementRatio)]);
+display(['quad set order: ' num2str(N)]);
 error_phi0_n
 order_phi_nMinus1
-display(char(strcat('soln_',assumedSoln)));
-display(char(num2str(order_phi_nMinus1(end))));
-
+display(num2str(order_phi_nMinus1(end)));
 order_phi=order_phi_nMinus1(end);
 
 end
