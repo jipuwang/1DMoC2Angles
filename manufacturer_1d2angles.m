@@ -30,7 +30,7 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i,error_ang_j]=...
       field4,value4,field5,value5,field6,value6,field7,value7);
   end
   if ~exist('assumedSoln','var')
-    assumedSoln='sine_sine_sine';
+    assumedSoln='sine-sine-sine';
   end
   
   % Material
@@ -47,7 +47,7 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i,error_ang_j]=...
   [alpha_i,weight_i]=lgwt(I,0,2*pi);alpha_i=flipud(alpha_i);
 
   %% Manufactured Solutions 
-  % Options includes: sine_sine_sine, etc.
+  % Options includes: sine-sine-sine, etc.
   switch assumedSoln
     case 'IHM'
       angleDep=@(mu,alpha) 2.0/(2*2*pi)+0.0*mu+0.0*alpha;
@@ -55,54 +55,66 @@ function [phi0_MMS_j,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i,error_ang_j]=...
       psi_MMS_Diff=@(x,mu,alpha) (0.0+0.0*x).*angleDep(mu,alpha);
       angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
       phi0_MMS =@(x) (1.0+0.0*x)*angleIntegral;
-    case 'sine_sine_sine'
+    case 'sine-sine-sine'
       angleDep=@(mu,alpha) sin(mu+1).*sin(alpha/(2*pi));
       psi_MMS=@(x,mu,alpha) (sin(pi/Tau.*x)+1).*angleDep(mu,alpha);
       psi_MMS_Diff=@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
       angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
       phi0_MMS =@(x) (sin(pi/Tau.*x)+1)*angleIntegral;
-    case 'sine_exp_exp'
+    case 'sine-exp-exp'
       angleDep=@(mu,alpha) exp(0.5.*(mu+1)).*exp(0.5/pi.*alpha);
       psi_MMS=@(x,mu,alpha) (sin(pi/Tau.*x)+1).*angleDep(mu,alpha);
       psi_MMS_Diff=@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
       angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
       phi0_MMS=@(x) (sin(pi/Tau.*x)+1)*angleIntegral;
-    case 'sine_const_const'
+    case 'sine-const-const'
       angleDep=@(mu,alpha) 1.0+mu*0.0+alpha*0.0;
       psi_MMS=@(x,mu,alpha) (sin(pi/Tau.*x)+1).*angleDep(mu,alpha);
       psi_MMS_Diff=@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
       angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
       phi0_MMS=@(x) (sin(pi/Tau.*x)+1)*angleIntegral;
-    case 'sine_complex_complex'
+    case 'sine-complex-complex'
       angleDep=@(mu,alpha) exp(cos(mu.*mu)).*exp(cos(0.25/(pi*pi)*alpha.*alpha));
       psi_MMS=@(x,mu,alpha) (sin(pi/Tau.*x)+1).*angleDep(mu,alpha);
       psi_MMS_Diff=@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
       angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
       phi0_MMS=@(x) (sin(pi/Tau.*x)+1)*angleIntegral;
-    case 'const_exp_exp'
+    case 'const-exp-exp'
       angleDep=@(mu,alpha) exp(0.5.*(mu+1)).*exp(0.5/pi.*alpha);
       psi_MMS=@(x,mu,alpha) (1.0+0.0*x).*angleDep(mu,alpha);
       psi_MMS_Diff=@(x,mu,alpha) 0.0*x.*angleDep(mu,alpha);
       angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
       phi0_MMS=@(x) (1.0+0.0*x)*angleIntegral;
-    case 'const_exp_const'
+    case 'const-exp-const'
       angleDep=@(mu,alpha) exp(0.5.*(mu+1))+0.0*alpha;
       psi_MMS=@(x,mu,alpha) (1.0+0.0*x).*angleDep(mu,alpha);
       psi_MMS_Diff=@(x,mu,alpha) 0.0*x.*angleDep(mu,alpha);
       angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
       phi0_MMS=@(x) (1.0+0.0*x)*angleIntegral;
-    case 'const_const_exp'
+    case 'const-const-exp'
       angleDep=@(mu,alpha) 0.0*mu+exp(0.5/pi.*alpha);
       psi_MMS=@(x,mu,alpha) (1.0+0.0*x).*angleDep(mu,alpha);
       psi_MMS_Diff=@(x,mu,alpha) 0.0*x.*angleDep(mu,alpha);
       angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
       phi0_MMS=@(x) (1.0+0.0*x)*angleIntegral;
-    case 'const_const_const'
+    case 'const-const-const'
       angleDep=@(mu,alpha) 1.0+(0.0*mu+0.0*alpha);
       psi_MMS=@(x,mu,alpha) (1.0+0.0*x).*angleDep(mu,alpha);
       psi_MMS_Diff=@(x,mu,alpha) 0.0*x.*angleDep(mu,alpha);
       angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
       phi0_MMS=@(x) (1.0+0.0*x)*angleIntegral;
+    case 'const-exp-complex'
+      angleDep=@(mu,alpha) exp(0.5.*(mu+1)).*exp(cos(0.25/(pi*pi)*alpha.*alpha));
+      psi_MMS=@(x,mu,alpha) (1.0+0.0*x).*angleDep(mu,alpha);
+      psi_MMS_Diff=@(x,mu,alpha) 0.0*x.*angleDep(mu,alpha);
+      angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
+      phi0_MMS=@(x) (1.0+0.0*x)*angleIntegral;
+    case 'sine-complex-exp'
+      angleDep=@(mu,alpha) exp(cos(mu.*mu)).*exp(0.5/pi.*alpha);
+      psi_MMS=@(x,mu,alpha) (sin(pi/Tau.*x)+1).*angleDep(mu,alpha);
+      psi_MMS_Diff=@(x,mu,alpha) pi/Tau.*cos(pi/Tau.*x).*angleDep(mu,alpha);
+      angleIntegral=integral2(angleDep, -1,1, 0,2*pi);
+      phi0_MMS=@(x) (sin(pi/Tau.*x)+1)*angleIntegral;
   end
   
   % Hopefully it can be cleaned up into this following form. 
