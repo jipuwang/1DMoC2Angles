@@ -22,14 +22,14 @@ if ~exist('assumedSoln','var')
   assumedSoln='IHM';
   assumedSoln='const-const-const';
   assumedSoln='const-const-exp';
-  assumedSoln='const-exp-const';
-  assumedSoln='sine-const-const';
-  assumedSoln='const-exp-exp';
-  assumedSoln='const-exp-complex';
-  assumedSoln='sine-sine-sine';
-  assumedSoln='sine-exp-exp';
+%   assumedSoln='const-exp-const';
+%   assumedSoln='sine-const-const';
+%   assumedSoln='const-exp-exp';
+%   assumedSoln='const-exp-complex';
+%   assumedSoln='sine-sine-sine';
+%   assumedSoln='sine-exp-exp';
   assumedSoln='sine-complex-exp';
-  assumedSoln='sine-complex-complex';
+%   assumedSoln='sine-complex-complex';
 end
 
 error_phi0_n=zeros(nGrids,1);
@@ -54,7 +54,7 @@ for iGrid=1:nGrids
 
   [phi0_j_ana,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i,error_ang_j]=...
         manufacturer_1d2angles(J,N,I,Tau,mat,assumedSoln);
-  error_ang_j=error_ang_j*0.0;
+%   error_ang_j=error_ang_j*0.0;
   [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
     psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i,error_ang_j);
 
@@ -96,6 +96,12 @@ loglog(orderPlotGrid,thirdOrder,'b--');
 loglog(orderPlotGrid,fourthOrder,'k--');
 legend('scalar flux error','1st Order','2nd Order',...
   '3rd Order','4th Order','location','best');
+
+set(get(gca,'xlabel'),'FontName','Times New Roman');
+set(get(gca,'ylabel'),'FontName','Times New Roman');
+set(get(gca,'title'),'FontName','Times New Roman');
+set(findobj(gcf, 'Type', 'Legend'),'FontName','Times New Roman');
+
 hold off;
 
 
