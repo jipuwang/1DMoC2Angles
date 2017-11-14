@@ -20,14 +20,13 @@ Tau=10;
 % Case configure options
 if ~exist('assumedSoln','var')
   assumedSoln='IHM';
-  assumedSoln='sine_exp_exp';
-  assumedSoln='sine_const_const';
-  assumedSoln='sine_complex_complex';
-%   assumedSoln='const_exp_exp';
-%   assumedSoln='const_exp_const';
-%   assumedSoln='const_const_exp';
-%   assumedSoln='const_const_const';
-  
+  assumedSoln='sine-sine-sine';
+  assumedSoln='sine-exp-exp';
+  assumedSoln='const-exp-const';
+  assumedSoln='const-const-exp';
+  assumedSoln='const-const-const';
+  assumedSoln='const-exp-complex';
+  assumedSoln='sine-complex-exp';
 end
 
 error_phi0_n=zeros(nGrids,1);
@@ -52,33 +51,13 @@ for iGrid=1:nGrids
 
   [phi0_j_ana,psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i,error_ang_j]=...
         manufacturer_1d2angles(J,N,I,Tau,mat,assumedSoln);
-      
+  error_ang_j=error_ang_j*0.0;
   [phi0_j]=OneDMoC_2Angles(J,N,I,Tau,mat,...
     psi_b1_n_i,psi_b2_n_i,Q_MMS_j_n_i,error_ang_j);
 
   % Calculate the error compared to manufactured solution
 %   error_ang_j=zeros(J,1);
   error_phi0_n(iGrid)=norm(phi0_j-phi0_j_ana-error_ang_j,2)/sqrt(J)
-  
-%   % Plot the solution
-%   figure(11);
-%   plot(phi0_j,'*-');
-%   hold on;
-%   grid on;
-%   switch assumedSoln
-%     case 'sine_sine_sine'
-%       phi0_MMS =@(x) (sin(pi/(size(phi0_j,1)).*x)+1)*4.090350086939905;
-%     case 'sine_exp_exp'
-%       phi0_MMS =@(x) (sin(pi/(size(phi0_j,1)).*x)+1)*37.102114262431876;
-%     case 'IHM'
-%       phi0_MMS =@(x) 2.0+0.0*x;
-%   end
-%   
-%   fplot(phi0_MMS,[0,size(phi0_j,1)],'bo-');
-%   legend('numerical','analytical');
-%   title('scalar flux');
-%   xlabel('mesh size [cm]');
-%   ylabel('scalar flux');
   
 end
 % figure(11); hold off;
@@ -93,9 +72,11 @@ end
 %% Visualize the asymptotic convergence
 orderPlotGrid=[gridMeshSize_n(1) gridMeshSize_n(end)];
 
-scalarFluxErrorRMS_plot_handle=figure(13);
+scalarFluxErrorRMS_plot_handle=figure;
 loglog(gridMeshSize_n,error_phi0_n,'*');
-% title('scalar flux error convergence');
+title({'scalar flux error convergence',...
+  ['\phi_{MMS}: ' assumedSoln]});
+
 xlabel('mesh size [cm]');
 ylabel('scalar flux error RMS');
 
@@ -106,10 +87,10 @@ firstOrder=[errorStt errorStt/refinementRatio^(nGrids-1)];
 secondOrder=[errorStt errorStt/refinementRatio^(2*(nGrids-1))];
 thirdOrder=[errorStt errorStt/refinementRatio^(3*(nGrids-1))];
 fourthOrder=[errorStt errorStt/refinementRatio^(4*(nGrids-1))];
-loglog(orderPlotGrid,firstOrder,'--');
-loglog(orderPlotGrid,secondOrder,'--');
-loglog(orderPlotGrid,thirdOrder,'--');
-loglog(orderPlotGrid,fourthOrder,'--');
+loglog(orderPlotGrid,firstOrder,'r--');
+loglog(orderPlotGrid,secondOrder,'g--');
+loglog(orderPlotGrid,thirdOrder,'b--');
+loglog(orderPlotGrid,fourthOrder,'k--');
 legend('scalar flux error','1st Order','2nd Order',...
   '3rd Order','4th Order','location','best');
 hold off;
