@@ -20,13 +20,16 @@ Tau=10;
 % Case configure options
 if ~exist('assumedSoln','var')
   assumedSoln='IHM';
+  assumedSoln='const-const-const';
+  assumedSoln='const-const-exp';
+  assumedSoln='const-exp-const';
+  assumedSoln='sine-const-const';
+  assumedSoln='const-exp-exp';
+  assumedSoln='const-exp-complex';
   assumedSoln='sine-sine-sine';
   assumedSoln='sine-exp-exp';
-  assumedSoln='const-exp-const';
-  assumedSoln='const-const-exp';
-  assumedSoln='const-const-const';
-  assumedSoln='const-exp-complex';
   assumedSoln='sine-complex-exp';
+  assumedSoln='sine-complex-complex';
 end
 
 error_phi0_n=zeros(nGrids,1);
